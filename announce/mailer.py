@@ -4,9 +4,8 @@
 """
 This program is a simple template driven mass emailer.
 
-A sample query to generate a list of the user of the cloud.
-
-SELECT rcuser.email, rcuser.displayname FROM rcshibboleth.user AS rcuser LEFT JOIN keystone.user AS kuser ON rcuser.user_id = kuser.id WHERE kuser.enabled = 1 GROUP BY rcuser.user_id INTO OUTFILE '/tmp/contacts.csv' FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n';
+You need a CSV file with a header. Use the header names as variables in the
+template file.
 """
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
@@ -92,10 +91,7 @@ if __name__ == "__main__":
 
     sent_addresses = set()
     with open(args.users) as csvfile:
-        for user in csv.DictReader(csvfile, fieldnames=['email', 'name']):
-            if user['email'] in sent_addresses:
-                print "Skipping duplicate:", user['email']
-                continue
+        for user in csv.DictReader(csvfile):
             sent_addresses.add(user['email'])
             to_address = user['email'] if not args.test else args.test_email
             content = template.render(user)
